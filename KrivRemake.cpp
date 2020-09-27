@@ -221,7 +221,40 @@ struct List
 	}
 	void SortTime()
 	{
-		for (int i = 0; i < count - 1; i++)
+
+		int d = count / 2;
+
+		while (d >= 1)
+		{
+			for (int m = 0; m < d; m++)
+			{
+				for (int i = m + d; i < count; i += d)
+				{ // сортировка подмассива
+
+					Train buf = Get(i)->train;
+
+					int j = i - d;
+
+					while (j >= 0 && (Get(j)->train.departureTimeHours < buf.departureTimeHours || Get(j)->train.departureTimeHours == buf.departureTimeHours && Get(j)->train.departureTimeMinutes < buf.departureTimeMinutes) && strcmp(Get(j)->train.station, Get(j - 1)->train.station) < 0)
+					{
+
+
+						Assign(j + d, Get(j)->train);
+
+						j -= d;
+
+					}
+
+					Assign(j + d, buf);
+
+				}
+
+			}
+
+			d /= 2;
+
+		}
+		/*for (int i = 0; i < count - 1; i++)
 		{
 
 			for (int j = count - 1; j > i; j--)
@@ -244,7 +277,7 @@ struct List
 				}
 			}
 
-		}
+		}*/
 	}
 	void Swap(int id1, int id2)
 	{
@@ -442,8 +475,61 @@ int main()
 		break;
 		case '4':
 		{
-			list->Get(4)->train.Show();
-			system("pause");
+			int kk;
+
+			printf("1 - поиск по городу\n");
+			printf("2 - поиск по номеру\n");
+			kk = _getch();
+			switch (kk)
+			{
+			case '1': {
+				char station[20];
+				printf("Укажите название города: ");
+				gets_s(station);
+				printf("\n\n");
+				bool s = false;
+				for (int i = 0; i < list->count; i++)
+				{
+					if (strcmp(station, list->Get(i)->train.station) == 0)
+					{
+						list->Get(i)->train.Show();
+						s = true;
+						printf("\n\n");
+					}
+				}
+				if (!s)
+				{
+					printf("Город не найден! \n");
+				}
+				system("pause");
+			}
+
+					break;
+			case '2':
+			{
+				int number;
+				bool s = false;
+				printf("Укажите номер поезда: ");
+				scanf_s("%d", &number);
+				printf("\n\n");
+				for (int i = 0; i < list->count; i++)
+				{
+					if (list->Get(i)->train.numOfTrain == number)
+					{
+						list->Get(i)->train.Show();
+						s = true;
+						printf("\n\n");
+					}
+				}
+				if (!s)
+				{
+					printf("Поезда с таким номером не существует! \n");
+				}
+				system("pause");
+
+			}
+			break;
+			}
 		}
 		break;
 		case '5':
