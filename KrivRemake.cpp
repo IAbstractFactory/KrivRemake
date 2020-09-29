@@ -4,75 +4,7 @@
 #include<Windows.h>
 #include<conio.h>
 #include<io.h>
-struct Date
-{
-	int day;
-	int month;
-	int year;
-	Date() {}
-	Date(int d, int m, int y)
-	{
-		day = d;
-		month = m;
-		year = y;
-	}
-	Date& operator=(Date& date)
-	{
-		this->day = date.day;
-		this->month = date.month;
-		this->year = date.year;
-		return *this;
-	}
-	bool operator==(Date date)
-	{
-		return day == date.day && month == date.month && year == date.year;
-	}
-};
-struct Time
-{
 
-	int minutes;
-	int hours;
-	Time() {}
-	Time(int h, int m)
-	{
-		minutes = m;
-		hours = h;
-	}
-	Time& operator=(Time time)
-	{
-		this->minutes = time.minutes;
-		this->hours = time.hours;
-		return *this;
-	}
-	bool operator==(Time time)
-	{
-		return minutes == time.minutes && hours == time.hours;
-	}
-	bool operator<(Time time)
-	{
-		if (hours < time.hours)
-		{
-			return true;
-		}
-		else if (hours > time.hours)
-		{
-			return false;
-		}
-		else
-		{
-			if (minutes < time.minutes)
-			{
-				return true;
-			}
-			else return false;
-		}
-	}
-	bool operator>(Time time)
-	{
-		return !(*this < time);
-	}
-};
 struct Train
 {
 	int numOfTrain;
@@ -201,19 +133,36 @@ struct List
 	}
 	void Sort()
 	{
-		for (int i = 0; i < count - 1; i++)
+		for (int i = 1; i < count; i++)
 		{
 
-			for (int j = count - 1; j > i; j--)
+			if (strcmp(Get(i)->train.station, Get(i - 1)->train.station) < 0)
 			{
 
-				if (strcmp(Get(j)->train.station, Get(j - 1)->train.station) < 0)
+				Train buf = Get(i)->train;
+
+				int left = 0;
+
+				int right = i - 1;
+
+				while (left <= right)
 				{
-					Swap(j, j - 1);
 
+					int mid = (left + right) / 2;
 
+					if (strcmp(buf.station, Get(mid)->train.station) > 0)
+
+						left = mid + 1;
+
+					else right = mid - 1;
 
 				}
+
+				for (int j = i - 1; j > right; j--)
+
+					Assign(j + 1, Get(j)->train);
+
+				Assign(right + 1, buf);
 
 			}
 
@@ -254,30 +203,6 @@ struct List
 			d /= 2;
 
 		}
-		/*for (int i = 0; i < count - 1; i++)
-		{
-
-			for (int j = count - 1; j > i; j--)
-			{
-				if (strcmp(Get(j)->train.station, Get(j - 1)->train.station) < 0)
-				{
-					if (Get(j)->train.departureTimeHours < Get(j - 1)->train.departureTimeHours)
-					{
-						Swap(j, j - 1);
-
-
-
-					}
-					else if (Get(j)->train.departureTimeHours == Get(j - 1)->train.departureTimeHours)
-					{
-						if (Get(j)->train.departureTimeMinutes < Get(j - 1)->train.departureTimeMinutes)
-							Swap(j, j - 1);
-
-					}
-				}
-			}
-
-		}*/
 	}
 	void Swap(int id1, int id2)
 	{
@@ -354,24 +279,39 @@ int main()
 	SetConsoleOutputCP(1251);
 	FILE* stream;
 	const char* fileName = "information.txt";
-	fopen_s(&stream, fileName, "rb+");
+
+
+	if (fopen_s(&stream, fileName, "rb+") != 0)
+	{
+		fopen_s(&stream, fileName, "wb+");
+	}
+
+
+
+
+
+
+
 	List* list = new List();
 	Train* info[] = {
 		new Train(1241, "Черкизовская",      21,10,16,2,17,20                              ,"Купе", 200) ,
 		new Train(2254, "Сокольники",        21,10,18,40,19,0                             , "Общий", 60),
 		new Train(2253, "Сокольники",        21,10,21,40,22,0                             , "Общий", 60),
+		
 		new Train(5533, "Красносельская",    21,10,22,1,22,40                              , "СВ", 93),
 		new Train(4223, "Комсомольская",     21,10,14,30,22,40                              , "СВ", 43),
 		new Train(4343, "Лубянка",           20,10,2,33,22,40                              , "СВ", 43),
 		new Train(5875, "Лубянка" ,          21,10,4,50,22,40                             ,"Плацкарт", 113),
 	};
-	int length = _filelength(_fileno(stream)) / sizeof(Train);
-	//printf("%d", length);
+	
+	
 	/*for (int i = 0; i < 7; i++)
 	{
 		fseek(stream, sizeof(Train) * i, 0);
 		fwrite(info[i], sizeof(Train), 1, stream);
 	}*/
+
+	int length = _filelength(_fileno(stream)) / sizeof(Train);
 	for (int i = 0; i < length; i++)
 	{
 		fseek(stream, sizeof(Train) * i, 0);
@@ -546,7 +486,7 @@ int main()
 
 			}
 
-			printf("Записано %d", list->count);
+
 			system("pause");
 			end = true;
 
@@ -557,5 +497,6 @@ int main()
 	}
 	fclose(stream);
 }
+
 
 
